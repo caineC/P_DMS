@@ -139,7 +139,6 @@ namespace P_DecisionSoft
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            const string localhost = "127.0.0.1";
             CheckRadioButtons();
             if (radioButton1.Checked)
             {
