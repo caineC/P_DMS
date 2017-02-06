@@ -10,8 +10,10 @@ using System.Windows.Forms;
 
 namespace P_DecisionSoft
 {
+   
     public partial class Form1 : Form
     {
+       
         public Dictionary<string, cardsuit> dict = new Dictionary<string, cardsuit>();
         public List<Card> cards = new List<Card>();
         public List<Card> Hand = new List<Card>();
@@ -49,7 +51,7 @@ namespace P_DecisionSoft
             }
             catch (Exception e)
             {
-                MessageBox.Show("Niepoprawny format danych w FLOP!!");
+                MessageBox.Show("Niepoprawny format danych w FLOP!!" + e.ToString());
                 return null;
             }
 
@@ -67,7 +69,7 @@ namespace P_DecisionSoft
             }
             catch (Exception e)
             {
-                MessageBox.Show("Niepoprawny format danych w TURN!!");
+                MessageBox.Show("Niepoprawny format danych w TURN!!" + e.ToString());
                 return null;
             }
         }
@@ -82,7 +84,7 @@ namespace P_DecisionSoft
             }
             catch (Exception e)
             {
-                MessageBox.Show("Niepoprawny format danych w RIVER!!");
+                MessageBox.Show("Niepoprawny format danych w RIVER!!" + e.ToString());
                 return null;
             }
 
@@ -103,7 +105,7 @@ namespace P_DecisionSoft
             }
             catch (Exception e)
             {
-                MessageBox.Show("Niepoprawny format danych w HAND!!");
+                MessageBox.Show("Niepoprawny format danych w HAND!!" + e.ToString());
                 return null;
             }
             return myCardList;
@@ -137,38 +139,60 @@ namespace P_DecisionSoft
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            const string localhost = "127.0.0.1";
             CheckRadioButtons();
             if (radioButton1.Checked)
             {
                 Game newGame = new Game(Hand);
                 newGame.Players[0].HandEval();
+                string score = Convert.ToString(newGame.Players[0].Score);
                 richTextBox1.Text = Convert.ToString(newGame.Players[0].Score);
+                List<string> messageTemp = new List<string>();
+                foreach (Card c in Hand)
+                    messageTemp.Add(c.ShowCard());
+                string message = string.Join(" ", messageTemp.ToArray());
+                TCPClient.Connect("127.0.0.1", message + " " + score);
+
+
             }
             else if (radioButton2.Checked)
             {
                 Game newGame = new Game(cards, Hand);
                 newGame.HandFlopEval(3);
                 richTextBox1.Text = Convert.ToString(newGame.Players[0].ScoreAfterFlop);
+                SendData(newGame);
+
             }
             else if(radioButton3.Checked)
             {
                 Game newGame = new Game(cards, Hand);
                 newGame.HandFlopEval(4);
                 richTextBox1.Text = Convert.ToString(newGame.Players[0].ScoreAfterFlop);
-            }else if (radioButton4.Checked)
+                SendData(newGame);
+            }
+            else if (radioButton4.Checked)
             {
                 Game newGame = new Game(cards, Hand);
                 newGame.HandFlopEval(5);
                 richTextBox1.Text = Convert.ToString(newGame.Players[0].ScoreAfterFlop);
+                SendData(newGame);
 
             }
 
             richTextBox1.SelectAll();
-            richTextBox1.SelectionAlignment = HorizontalAlignment.Center;
-            
-
+            richTextBox1.SelectionAlignment = HorizontalAlignment.Center;   
         }
-
+        private void SendData(Game newGame)
+        {
+            List<string> messageTemp = new List<string>();
+            foreach (Card c in Hand)
+                messageTemp.Add(c.ShowCard());
+            foreach (Card c in cards)
+                messageTemp.Add(c.ShowCard());
+            string message = string.Join(" ", messageTemp.ToArray());
+            string score = Convert.ToString(newGame.Players[0].ScoreAfterFlop);
+            TCPClient.Connect("127.0.0.1", message + " " + score);
+        }
         private void card1_TextChanged(object sender, EventArgs e)
         {
 

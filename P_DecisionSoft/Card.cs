@@ -19,9 +19,10 @@ namespace P_DecisionSoft
             Suit = suit;
             Val = val;
         }
-        public void ShowCard()
+        public string ShowCard()
         {
             WriteLine(Suit + " " + Val);
+            return Suit + ":" + Val;
         }
 
     }
